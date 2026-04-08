@@ -58,12 +58,6 @@ struct DownloadCleaner {
                 continue
             }
 
-            if isPDF(file) {
-                movePDF(file, in: downloadsURL)
-                print("PDF file found:", file.lastPathComponent, "modified on", modifiedDate, "- moved to pdfs folder.")
-                continue
-            }
-
             print("Old file found:", file.lastPathComponent, "modified on", modifiedDate)
             
             
@@ -77,58 +71,6 @@ struct DownloadCleaner {
                 print("Failed to trash:", error)
             }
         }
-    }
-
-    private func isPDF(_ url: URL) -> Bool {
-        guard let type = try? url
-            .resourceValues(forKeys: [.contentTypeKey])
-            .contentType else {
-            return false
-        }
-
-        return type.conforms(to: .pdf)
-    }
-
-    private func movePDF(_ file: URL, in downloadsURL: URL) {
-        let fileManager = FileManager.default
-
-        guard let pdfsFolder = ensurePDFsFolder(in: downloadsURL) else {
-            print("Could not ensure pdfs folder.")
-            return
-        }
-
-        let destination = pdfsFolder.appendingPathComponent(file.lastPathComponent)
-
-        // Avoid overwriting
-        guard !fileManager.fileExists(atPath: destination.path) else {
-            print("PDF already exists:", destination.lastPathComponent)
-            return
-        }
-
-        do {
-            try fileManager.moveItem(at: file, to: destination)
-            print("Moved PDF:", file.lastPathComponent)
-        } catch {
-            print("Failed to move PDF:", file.lastPathComponent, error)
-        }
-    }
-
-    private func ensurePDFsFolder(in downloadsURL: URL) -> URL? {
-        let pdfsFolder = downloadsURL.appendingPathComponent("pdfs")
-
-        if !FileManager.default.fileExists(atPath: pdfsFolder.path) {
-            do {
-                try FileManager.default.createDirectory(
-                    at: pdfsFolder,
-                    withIntermediateDirectories: false
-                )
-            } catch {
-                print("Failed to create pdfs folder:", error)
-                return nil
-            }
-        }
-
-        return pdfsFolder
     }
 
     private func obtainDownloadsURL() -> URL? {

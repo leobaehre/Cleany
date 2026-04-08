@@ -38,6 +38,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
+
+        syncLaunchAtLoginState()
+
         rebuildMenu()
         startMenuRefreshTimer()
 
@@ -49,6 +52,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         runCleanupIfNeeded()
+    }
+    
+    private func syncLaunchAtLoginState() {
+        do {
+            if settings.cleanAtLogin {
+                if SMAppService.mainApp.status != .enabled {
+                    do {
+                        try SMAppService.mainApp.register()
+                    } catch {
+                        print(error)
+                    }
+                    print("Registered at login on launch")
+                }
+            } else {
+                if SMAppService.mainApp.status == .enabled {
+                    try SMAppService.mainApp.unregister()
+                    print("Unregistered at login on launch")
+                }
+            }
+        } catch {
+            print("Failed to sync launch at login:", error)
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
