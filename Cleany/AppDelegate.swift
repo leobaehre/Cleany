@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         ("Every 24 hours", 24)
     ]
 
-    private let cutoffOptions: [Int] = [7, 30, 90, 365]
+    private let cutoffOptions: [Int] = [1, 3, 7, 30, 90, 365]
 
     var statusItem: NSStatusItem!
     var menuRefreshTimer: Timer?
@@ -166,7 +166,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         for days in cutoffOptions {
             let item = NSMenuItem(
-                title: "\(days) days",
+                title: days > 1 ? "\(days) days" : "\(days) day",
                 action: #selector(selectCutoff(_:)),
                 keyEquivalent: ""
             )
